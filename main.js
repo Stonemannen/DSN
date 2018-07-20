@@ -8,13 +8,6 @@ const crypto = require('crypto');
 
 const SHA256 = require("crypto-js/sha256");
 
-/*const node = new IPFS({ repo: "ipfss/" + String(Math.random() + Date.now()), EXPERIMENTAL: {pubsub: true}, config: {
-    Addresses: {
-      Swarm: [
-        '/dns4/ws-star.discovery.libp2p.io/tcp/443/wss/p2p-websocket-star'
-      ]
-    }
-}})*/
 const node = new IPFS({ repo: "ipfss/" + String(Math.random() + Date.now()),
 start: true,
 EXPERIMENTAL: {
@@ -36,51 +29,19 @@ config: {
 
 //const room = Room(node, 'ins')
 var orbitdb;
-var db;
+var profileDB;
 node.on('ready', async () => {
     console.log("starting Orbit...")
     orbitdb = new OrbitDB(node)
-    db = await orbitdb.open("/orbitdb/QmTEz9FdkrcBDwnFe4aiMt8e8x7J45EajnywSXc8Ff7G4E/IPSN", { sync: true })
-    await db.load()
+    profileDB = await orbitdb.open("/orbitdb/QmSexedp5pUNuHrXGDZ9NZXtWCQf156Lfar9mqstRZwr77/DSN", { sync: true })   
     console.log("ready");
-
-    db.events.on('replicated', (address) => {
-        console.log(db.iterator({ limit: -1 }).collect().map((e) => e.payload.value))
+    profileDB.events.on('replicated', (address) => {
+        console.log(profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value))
     })
+    profileDB.load()
 })
-/*
-node.once('ready', () => {
-    console.log('IPFS node is ready')
-    /*const orbit = new Orbit(IPFS,{ keystorePath:"/",maxHistory: 64 });
-    orbit.events.on('connected', (network) => {
-        console.log(`Connected as ${orbit.user.name}`)
-    })
-      
-    orbit.connect('Nonz')*/
 
-    
-    
-    /*
-    room.on('peer joined', (peer) => {
-        console.log('Peer joined the room', peer)
-    })
-    
-    room.on('peer left', (peer) => {
-        console.log('Peer left...', peer)
-    })
-    
-    // now started to listen to room
-    room.on('subscribed', () => {
-        console.log('Now connected!')
-    })
 
-    room.on('message', (message) => {
-        console.log(String(message.data))
-    })
-
-    
-})
-*/
 function store(){
     var toStore = "Nonzi";
 
@@ -108,24 +69,24 @@ function display(hash){
 }
 
 async function orbit(){
-    await db.add("Nonzi")
-    const all = db.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
+    await profileDB.add("Nonzi")
+    const all = profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
     console.log(all);
 }
 
 async function createdb(){
-    var name = "IPSN"
-    db = await orbitdb.open(name, {
+    var name = "DSN"
+    profileDB = await orbitdb.open(name, {
         // If database doesn't exist, create it
         create: true, 
         overwrite: true,
         // Load only the local version of the database, 
         // don't load the latest from the network yet
         localOnly: false,
-        type: "eventlog",
+        type: "feed",
         write: ['*'],
     })
-    console.log(db.address.toString())
+    console.log(profileDB.address.toString())
 }
 
 async function createProfile(){
@@ -138,8 +99,8 @@ async function createProfile(){
     var Hash = SHA256(Type + username + PublicKey + Metadata).toString();
     var Sign = CryptoEdDSAUtil.signHash(keyPair, Hash);
     var profile = {type: Type, name: username, publicKey: PublicKey, metadata: Metadata, hash: Hash, sign: Sign}
-    await db.add(JSON.stringify(profile));
-    const all = db.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
+    await profileDB.add(JSON.stringify(profile));
+    const all = profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
     console.log(all);
 }
 
@@ -149,6 +110,13 @@ async function createKeyPair(){
     var publicKey = CryptoEdDSAUtil.toHex(keyPair.getPublic());
     console.log("privateKey: " + privateKey);
     console.log("publicKey: " + publicKey);
+}
+
+async function post(){
+    var Type = "post";
+    var Time =  Date.now();
+    var Metadata = {};
+    var post = {type: Type, time: Time, metadata: Metadata};
 }
 
 document.addEventListener('DOMContentLoaded', () => {
