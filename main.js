@@ -94,12 +94,29 @@ async function createProfile(){
     var PublicKey = document.getElementById('publicKey').value;
     var privateKey = document.getElementById('privateKey').value;
     var keyPair = CryptoEdDSAUtil.generateKeyPairFromSecret(privateKey);
-    var Type = "profile";
     var Metadata = {};
-    var Hash = SHA256(Type + username + PublicKey + Metadata).toString();
+    var Posts = [];
+    var Hash = SHA256(PublicKey + username + Metadata, Posts).toString();
     var Sign = CryptoEdDSAUtil.signHash(keyPair, Hash);
-    var profile = {type: Type, name: username, publicKey: PublicKey, metadata: Metadata, hash: Hash, sign: Sign}
-    await profileDB.add(JSON.stringify(profile));
+    var profile = {publicKey: PublicKey, name: username, metadata: Metadata, posts: Posts, hash: Hash, sign: Sign}
+    await node.files.add(Buffer.from(JSON.stringify(profile)), (err, res) => {
+        if (err || !res) {
+            return console.error('ipfs add error', err, res)
+        }
+
+        res.forEach((file) => {
+            if (file && file.hash) {
+            console.log('successfully stored', file.hash)
+            publishProfile(PublicKey, file.hash);
+            }
+        })
+    })
+    
+}
+
+async function publishProfile(PublicKey, profileHash){
+    var dbProfile = {publicKey: PublicKey, hash: profileHash}
+    await profileDB.add(JSON.stringify(dbProfile));
     const all = profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
     console.log(all);
 }
@@ -113,10 +130,28 @@ async function createKeyPair(){
 }
 
 async function post(){
-    var Type = "post";
+    var Text = document.getElementById("post").value;
+    var PublicKey = document.getElementById("publicKey").value;
     var Time =  Date.now();
+    var Content = [{type: "txt", text: Text}];
     var Metadata = {};
-    var post = {type: Type, time: Time, metadata: Metadata};
+    var post = {publicKey: PublicKey, time: Time, content: Content, metadata: Metadata};
+}
+
+function getProfile(){
+    var publicKey = document.getElementById('profilePubKey').value
+    const all = profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
+    for(var i = 0; i < all.length; i++){
+        var body = JSON.parse(all[i]);
+        if(body.publicKey == publicKey){
+            node.files.get(body.hash, function (err, files) {
+                files.forEach((file) => {
+                  console.log(file.path)
+                  console.log(file.content.toString('utf8'))
+                })
+            })
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -125,4 +160,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('post').onclick = post
     document.getElementById('profile').onclick = createProfile
     document.getElementById('createKeyPair').onclick = createKeyPair
+    document.getElementById('getProfile').onclick = getProfile
 })
