@@ -94,8 +94,8 @@ async function createdb(){
 
 async function createProfile(){
     var username = document.getElementById('name').value;
-    var PublicKey = document.getElementById('publicKey').value;
-    var privateKey = document.getElementById('privateKey').value;
+    var PublicKey = getCookie("publicKey").value;
+    var privateKey = getCookie("privateKey").value;
     var keyPair = CryptoEdDSAUtil.generateKeyPairFromSecret(privateKey);
     var Metadata = {};
     var Posts = [];
@@ -147,8 +147,8 @@ async function createKeyPair(){
 async function post(){
     console.log("post");
     var Text = document.getElementById("postText").value;
-    var PublicKey = document.getElementById("publicKey").value;
-    var privateKey = document.getElementById('privateKey').value;
+    var PublicKey = getCookie("publicKey").value;
+    var privateKey = getCookie("privateKey").value;
     var keyPair = CryptoEdDSAUtil.generateKeyPairFromSecret(privateKey);
     var Time =  Date.now();
     var Content = [{type: "txt", text: Text}];
@@ -237,6 +237,49 @@ function updateProfilePost(pubKey, privateKey, hash){
     }
 }
 
+function followProfile(){
+    var publicKey = getCookie("publicKey").value
+    const all = profileDB.iterator({ limit: -1 }).collect().map((e) => e.payload.value)
+    for(var i = 0; i < all.length; i++){
+        var body = JSON.parse(all[i]);
+        if(body.publicKey == publicKey){
+            node.files.get(body.hash, function (err, files) {
+                files.forEach((file) => {
+                    console.log(file.content.toString('utf8'))
+
+                })
+            })
+        }
+    }
+}
+
+function login(){
+    setCookie("publicKey", document.getElementById('publicKey'), 30);
+    setCookie("privateKey", document.getElementById('privateKey'), 30);
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createdb').onclick = createdb
     document.getElementById('store').onclick = orbit
@@ -244,4 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('profile').onclick = createProfile
     document.getElementById('createKeyPair').onclick = createKeyPair
     document.getElementById('getProfile').onclick = getProfile
+    document.getElementById('followProfile').onclick = followProfile
+    document.getElementById('login').onclick = login
 })
