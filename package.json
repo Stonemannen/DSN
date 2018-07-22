@@ -1,7 +1,7 @@
 {
-  "name": "isn",
+  "name": "dsn",
   "version": "1.0.0",
-  "description": "",
+  "description": "Decentralized social network based on ipfs",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,8 +10,12 @@
     "start": "npm run bundle",
     "star": "rendezvous --port=9090 --host=127.0.0.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Stonemannen/DSN.git"
+  },
   "author": "Lucas Drufva <stonemannen1@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "browserify": "^16.2.2",
     "crypto": "^1.0.1",
