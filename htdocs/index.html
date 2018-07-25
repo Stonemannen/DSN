@@ -4,9 +4,10 @@
     <title>DSN</title>
 </head>
 <body>
+    <a id='loginn' href="./login.html"></a>
     <script>
         if(!getCookie("publicKey")){
-            location.href = "./Login.html";
+            document.getElementById('loginn').click();
         }
 
         function getCookie(cname) {
