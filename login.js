@@ -25,7 +25,7 @@ function login() {
     setCookie("publicKey", publicKey, 30);
     setCookie("privateKey", privateKey, 30);
     setCookie("error", "")
-    location.href = '/index.html';
+    location.href = './index.html';
 }
 
 function signup() {
@@ -47,7 +47,7 @@ function signup() {
     setCookie("publicKey", publicKey, 30);
     setCookie("privateKey", privateKey, 30);
     setCookie("createProfile", username);
-    location.href = '/index.html';
+    location.href = './index.html';
 }
 
 function setCookie(cname, cvalue, exdays) {

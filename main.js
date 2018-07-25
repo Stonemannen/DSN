@@ -100,7 +100,7 @@ node.on('ready', async () => {
         }
         if (!succes) {
             setCookie("error", "login");
-            location.href = '/login.html';
+            location.href = './login.html';
         }
     }
 })
