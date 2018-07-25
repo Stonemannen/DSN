@@ -45,10 +45,64 @@ node.on('ready', async () => {
             limit: -1
         }).collect().map((e) => e.payload.value))
     })
-    profileDB.load()
+    await profileDB.load()
     console.log(profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value))
+
+    if (getCookie("createProfile")) {
+        var username = getCookie("createProfile")
+        if (getCookie("publicKey")) {
+            var PublicKey = getCookie("publicKey");
+            var privateKey = getCookie("privateKey");
+        } else {
+            var PublicKey = document.getElementById("publicKey").value;
+            var privateKey = document.getElementById("privateKey").value;
+        }
+        var keyPair = CryptoEdDSAUtil.generateKeyPairFromSecret(privateKey);
+        var Follow = []
+        var Metadata = {
+            follow: Follow
+        };
+        var Posts = [];
+        var Hash = SHA256(PublicKey + username + Metadata + Posts).toString();
+        var Sign = CryptoEdDSAUtil.signHash(keyPair, Hash);
+        var profile = {
+            publicKey: PublicKey,
+            name: username,
+            metadata: Metadata,
+            posts: Posts,
+            hash: Hash,
+            sign: Sign
+        }
+        await node.files.add(Buffer.from(JSON.stringify(profile)), (err, res) => {
+            if (err || !res) {
+                return console.error('ipfs add error', err, res)
+            }
+
+            res.forEach((file) => {
+                if (file && file.hash) {
+                    console.log('successfully stored', file.hash)
+                    publishProfile(PublicKey, username, file.hash);
+                }
+            })
+        })
+    } else {
+        var succes = false;
+        var all = profileDB.iterator({
+            limit: -1
+        }).collect().map((e) => e.payload.value)
+        for (var i = 0; i < all.length; i++) {
+            var body = JSON.parse(all[i]);
+            if (body.publicKey == getCookie("publicKey")) {
+                succes = true;
+            }
+        }
+        if (!succes) {
+            setCookie("error", "login");
+            location.href = '/login.html';
+        }
+    }
 })
 
 
@@ -136,19 +190,20 @@ async function createProfile() {
         res.forEach((file) => {
             if (file && file.hash) {
                 console.log('successfully stored', file.hash)
-                publishProfile(PublicKey, file.hash);
+                publishProfile(PublicKey, username, file.hash);
             }
         })
     })
 
 }
 
-async function publishProfile(PublicKey, profileHash) {
+async function publishProfile(PublicKey, Name, profileHash) {
     var all = profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value)
     for (var i = 0; i < all.length; i++) {
-        console.log(all[i])
+        console.log(all);
+        console.log(all[i]);
         var body = JSON.parse(all[i]);
         if (body.publicKey == PublicKey) {
             all = profileDB.iterator({
@@ -163,6 +218,7 @@ async function publishProfile(PublicKey, profileHash) {
     }
     var dbProfile = {
         publicKey: PublicKey,
+        username: Name,
         hash: profileHash
     }
     await profileDB.add(JSON.stringify(dbProfile));
