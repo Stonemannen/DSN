@@ -219,6 +219,7 @@ async function publishProfile(PublicKey, Name, profileHash) {
     var dbProfile = {
         publicKey: PublicKey,
         username: Name,
+
         hash: profileHash
     }
     await profileDB.add(JSON.stringify(dbProfile));
