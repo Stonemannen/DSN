@@ -340,7 +340,7 @@ function updateProfilePost(pubKey, privateKey, hash) {
                         res.forEach((file) => {
                             if (file && file.hash) {
                                 console.log('successfully stored', file.hash)
-                                publishProfile(pubKey, file.hash);
+                                publishProfile(pubKey, profile.name, file.hash);
                             }
                         })
                     })
@@ -383,7 +383,7 @@ function followProfile() {
                         res.forEach((file) => {
                             if (file && file.hash) {
                                 console.log('successfully stored', file.hash)
-                                publishProfile(publicKey, file.hash);
+                                publishProfile(publicKey, profile.name, file.hash);
                             }
                         })
                     })

@@ -39,6 +39,9 @@ node.on('ready', async () => {
         console.log(profileDB.iterator({
             limit: -1
         }).collect().map((e) => e.payload.value))
+        socket.emit('orbit', profileDB.iterator({
+            limit: 1
+        }).collect().map((e) => e.payload.value));
     })
     await profileDB.load()
     console.log(profileDB.iterator({
