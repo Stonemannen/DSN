@@ -4,6 +4,27 @@
     <title>DSN</title>
 </head>
 <body>
+    <a id='loginn' href="./login.html"></a>
+    <script>
+        if(!getCookie("publicKey")){
+            document.getElementById('loginn').click();
+        }
+
+        function getCookie(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }    
+    </script>
     <script src="bundle.js"></script>
     <label>PublicKey</label>
     <input type="text" id="publicKey">
@@ -22,7 +43,9 @@
     <label>Profile Public Key</label>
     <input type="text" id="profilePubKey">
     <button id="getProfile">Get Profile</button>
-    <button id="followProfile">Follow Profile</button><br>
+    <button id="followProfile">Follow Profile</button><br><br>
+    <input type="text" id="searchText">
+    <button id="search">Search</button>
     <button id="updateFeed">Update Feed</button>
 
     <div id='feed'>
