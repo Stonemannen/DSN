@@ -47,8 +47,12 @@ node.on('ready', async () => {
     console.log(profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value))
+    socket.emit('orbit', profileDB.iterator({
+        limit: 1
+    }).collect().map((e) => e.payload.value));
 
     socket.emit('ipfs', 'ready');
+    setTimeout(sendData, 3000)
 })
 
 async function createdb() {
@@ -66,8 +70,18 @@ async function createdb() {
     console.log(profileDB.address.toString())
 }
 
+function sendData(){
+    socket.emit('orbit', profileDB.iterator({
+        limit: 1
+    }).collect().map((e) => e.payload.value));
+    console.log("sent");
+    setTimeout(sendData, 30000);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('createdb').onclick = createdb
 })
+
+
 
 

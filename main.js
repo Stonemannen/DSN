@@ -45,23 +45,18 @@ node.on('ready', async () => {
             limit: -1
         }).collect().map((e) => e.payload.value))
     })
-    
+
     console.log(profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value))
-    
+
     if (getCookie("createProfile")) {
         console.log("Creating new profile...")
         var username = getCookie("createProfile")
-        if (getCookie("publicKey")) {
-            var PublicKey = getCookie("publicKey");
-            var privateKey = getCookie("privateKey");
-        } else {
-            var PublicKey = document.getElementById("publicKey").value;
-            var privateKey = document.getElementById("privateKey").value;
-        }
+        var PublicKey = getCookie("publicKey");
+        var privateKey = getCookie("privateKey");
         var keyPair = CryptoEdDSAUtil.generateKeyPairFromSecret(privateKey);
-        var Follow = []
+        var Follow = [PublicKey]
         var Metadata = {
             follow: Follow
         };
@@ -85,38 +80,38 @@ node.on('ready', async () => {
                 if (file && file.hash) {
                     console.log('successfully stored', file.hash)
                     publishProfile(PublicKey, username, file.hash);
-                    setCookie("createProfile", "")
+                    deleteCookie("createProfile");
                 }
             })
         })
-    } 
+    }
     await profileDB.load()
     console.log("DB Loaded")
 })
 
-function validateLogin(){
+function validateLogin() {
     console.log("Validating credentials")
-        console.log(profileDB.iterator({
-            limit: -1
-        }).collect().map((e) => e.payload.value))
-        var succes = false;
-        var all = profileDB.iterator({
-            limit: -1
-        }).collect().map((e) => e.payload.value)
-        for (var i = 0; i < all.length; i++) {
-            var body = JSON.parse(all[i]);
-            if (body.publicKey == getCookie("publicKey")) {
-                succes = true;
-                updateFeed();
-                document.getElementById('loginDiv').style.display = "none";
-                document.getElementById('mainDiv').style.display = "block";
-            }
+    console.log(profileDB.iterator({
+        limit: -1
+    }).collect().map((e) => e.payload.value))
+    var succes = false;
+    var all = profileDB.iterator({
+        limit: -1
+    }).collect().map((e) => e.payload.value)
+    for (var i = 0; i < all.length; i++) {
+        var body = JSON.parse(all[i]);
+        if (body.publicKey == getCookie("publicKey")) {
+            succes = true;
+            updateFeed();
+            document.getElementById('loginDiv').style.display = "none";
+            document.getElementById('mainDiv').style.display = "block";
         }
-        if (!succes) {
-            setCookie("error", "login");
-            deleteCookie("publicKey");
-            location.href = './index.html';
-        }
+    }
+    if (!succes) {
+        setCookie("error", "login");
+        deleteCookie("publicKey");
+        location.href = './index.html';
+    }
 }
 
 function store() {
@@ -366,11 +361,7 @@ function updateProfilePost(pubKey, privateKey, hash) {
 function followProfile() {
     var follow = document.getElementById('profilePubKey').value
     console.log("follow: " + follow)
-    if (getCookie("publicKey")) {
-        var publicKey = getCookie("publicKey");
-    } else {
-        var publicKey = document.getElementById('publicKey').value
-    }
+    var publicKey = getCookie("publicKey");
     console.log("pubkey: " + publicKey)
     const all = profileDB.iterator({
         limit: -1
@@ -469,9 +460,9 @@ function updateFeed() {
     }
 }
 
-function deleteCookie( name ) {
+function deleteCookie(name) {
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-  }
+}
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -567,11 +558,7 @@ function follow(username) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('createdb').onclick = createdb
-    document.getElementById('store').onclick = orbit
     document.getElementById('post').onclick = post
-    document.getElementById('profile').onclick = createProfile
-    document.getElementById('createKeyPair').onclick = createKeyPair
     document.getElementById('getProfile').onclick = getProfile
     document.getElementById('followProfile').onclick = followProfile
     document.getElementById('login').onclick = login

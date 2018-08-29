@@ -42,6 +42,7 @@ io.on('connection', function (socket) {
 
     socket.on('orbit', function (msg) {
         pin(msg);
+        console.log("pin");
     });
 
 });
