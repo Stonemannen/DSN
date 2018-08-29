@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "browserify main.js -o htdocs/bundle.js && browserify login.js -o htdocs/loginbundle.js && browserify pinnerweb.js -o pinnerbundle.js",
-    "minify": "node-minify --compressor babel-minify --input bundle.js --output htdocs/bundle.min.js",
+    "bundle": "browserify main.js -o htdocs/js/bundle.js && browserify login.js -o htdocs/js/loginbundle.js && browserify pinnerweb.js -o pinnerbundle.js",
+    "minify": "node-minify --compressor babel-minify --input bundle.js --output htdocs/js/bundle.min.js",
     "start": "npm run bundle",
     "star": "rendezvous --port=9090 --host=127.0.0.1"
   },

@@ -51,4 +51,23 @@ node.on('ready', async () => {
     socket.emit('ipfs', 'ready');
 })
 
+async function createdb() {
+    var name = "DSN"
+    profileDB = await orbitdb.open(name, {
+        // If database doesn't exist, create it
+        create: true,
+        overwrite: true,
+        // Load only the local version of the database, 
+        // don't load the latest from the network yet
+        localOnly: false,
+        type: "feed",
+        write: ['*'],
+    })
+    console.log(profileDB.address.toString())
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('createdb').onclick = createdb
+})
+
 

@@ -25,7 +25,7 @@ function login() {
     setCookie("publicKey", publicKey, 30);
     setCookie("privateKey", privateKey, 30);
     setCookie("error", "")
-    document.getElementById('indexx').click();
+    validateLogin();
 }
 
 function signup() {
@@ -50,18 +50,27 @@ function signup() {
     document.getElementById('indexx').click();
 }
 
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
-
 function checkPassword(str) {
     // at least one number, one lowercase and one uppercase letter
     // at least six characters
     var re = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/;
     return re.test(str);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('signup').onclick = signup;
+    document.getElementById('login').onclick = login;
+})
+
+function deleteCookie( name ) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  }
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
 function getCookie(cname) {
@@ -78,8 +87,3 @@ function getCookie(cname) {
     }
     return "";
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('signup').onclick = signup;
-    document.getElementById('login').onclick = login;
-})

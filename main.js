@@ -49,8 +49,7 @@ node.on('ready', async () => {
     console.log(profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value))
-    await profileDB.load()
-    console.log("DB Loaded")
+    
     if (getCookie("createProfile")) {
         console.log("Creating new profile...")
         var username = getCookie("createProfile")
@@ -90,8 +89,13 @@ node.on('ready', async () => {
                 }
             })
         })
-    } else {
-        console.log("Validating credentials")
+    } 
+    await profileDB.load()
+    console.log("DB Loaded")
+})
+
+function validateLogin(){
+    console.log("Validating credentials")
         console.log(profileDB.iterator({
             limit: -1
         }).collect().map((e) => e.payload.value))
@@ -104,16 +108,16 @@ node.on('ready', async () => {
             if (body.publicKey == getCookie("publicKey")) {
                 succes = true;
                 updateFeed();
+                document.getElementById('loginDiv').style.display = "none";
+                document.getElementById('mainDiv').style.display = "block";
             }
         }
         if (!succes) {
             setCookie("error", "login");
-            setCookie("publicKey", "");
-            location.href = './login.html';
+            deleteCookie("publicKey");
+            location.href = './index.html';
         }
-    }
-})
-
+}
 
 function store() {
     var toStore = "Nonzi";
@@ -464,6 +468,10 @@ function updateFeed() {
         }
     }
 }
+
+function deleteCookie( name ) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  }
 
 function setCookie(cname, cvalue, exdays) {
     var d = new Date();
