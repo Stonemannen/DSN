@@ -27,6 +27,8 @@ const node = new IPFS({
     }
 })
 
+document.getElementById('loginDiv').style.display = "none";
+document.getElementById('mainDiv').style.display = "none";
 
 //const room = Room(node, 'ins')
 var orbitdb;
@@ -87,6 +89,15 @@ node.on('ready', async () => {
     }
     await profileDB.load()
     console.log("DB Loaded")
+
+    if (!getCookie("publicKey")) {
+        document.getElementById('loginDiv').style.display = "block";
+        document.getElementById('mainDiv').style.display = "none";
+    }else{
+        document.getElementById('loginDiv').style.display = "none";
+        document.getElementById('mainDiv').style.display = "block";
+    }
+    document.getElementById('loading').style.display = "none";
 })
 
 function validateLogin() {

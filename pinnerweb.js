@@ -5,6 +5,10 @@ var IPFS = require('ipfs');
 var io = require('./socket.io.js');
 var socket = io();
 
+process.on('uncaughtException', function (err) {
+    console.log('Caught exception: ', err);
+});
+
 const node = new IPFS({
     repo: "ipfss/" + String(Math.random() + Date.now()),
     start: true,
@@ -72,7 +76,7 @@ async function createdb() {
 
 function sendData(){
     socket.emit('orbit', profileDB.iterator({
-        limit: 1
+        limit: -1
     }).collect().map((e) => e.payload.value));
     console.log("sent");
     setTimeout(sendData, 30000);

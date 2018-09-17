@@ -25,6 +25,8 @@ function login() {
     setCookie("publicKey", publicKey, 30);
     setCookie("privateKey", privateKey, 30);
     setCookie("error", "")
+    document.getElementById('loginDiv').style.display = "none";
+    document.getElementById('mainDiv').style.display = "block";
 }
 
 function signup() {

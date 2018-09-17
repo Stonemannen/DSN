@@ -3,6 +3,10 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+process.on('uncaughtException', function (err) {
+    console.log('Caught exception: ', err);
+});
+
 const node = new IPFS({
     repo: "ipfsss/" + String(Math.random() + Date.now()),
     start: true,
@@ -54,25 +58,28 @@ http.listen(3000, function () {
 function pin(msg) {
     console.log(msg);
     if (msg[0]) {
-        console.log(msg[0]);
-        var body = JSON.parse(msg[0]);
-        node.files.get(body.hash, function (err, files) {
-            files.forEach((file) => {
-                console.log(file.path)
-                console.log(file.content.toString('utf8'))
-                var profile = JSON.parse(file.content.toString('utf8'));
-                if(profile.posts.length > 0){
-                    for(var i = 0; i < profile.posts.length; i++){
-                        node.files.get(profile.posts[i], function (err, files) {
-                            files.forEach((file) => {
-                                console.log(file.path)
-                                console.log(file.content.toString('utf8'))
+        for (var i = 0; i < msg.length; i++) {
+            console.log(msg[i]);
+            var body = JSON.parse(msg[i]);
+            node.files.get(body.hash, function (err, files) {
+                files.forEach((file) => {
+                    console.log(file.path)
+                    console.log(file.content.toString('utf8'))
+                    var profile = JSON.parse(file.content.toString('utf8'));
+                    if (profile.posts.length > 0) {
+                        for (var j = 0; j < profile.posts.length; j++) {
+                            node.files.get(profile.posts[j], function (err, files) {
+                                files.forEach((file) => {
+                                    console.log(file.path)
+                                    console.log(file.content.toString('utf8'))
+                                })
                             })
-                        })
+                        }
                     }
-                }
+                })
             })
-        })
+        }
+
     }
 
 
