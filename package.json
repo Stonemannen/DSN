@@ -5,10 +5,11 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "browserify main.js -o htdocs/js/bundle.js && browserify login.js -o htdocs/js/loginbundle.js && browserify pinnerweb.js -o pinnerbundle.js",
+    "bundle": "browserify -t [ babelify --presets [ react ] ] main.js -o htdocs/js/bundle.js && browserify login.js -o htdocs/js/loginbundle.js && browserify pinnerweb.js -o pinnerbundle.js",
     "minify": "node-minify --compressor babel-minify --input bundle.js --output htdocs/js/bundle.min.js",
     "start": "npm run bundle",
-    "star": "rendezvous --port=9090 --host=127.0.0.1"
+    "star": "rendezvous --port=9090 --host=127.0.0.1",
+    "babel": "npx babel --watch js --out-dir . --presets react-app/prod"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,11 @@
   "author": "Lucas Drufva <stonemannen1@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-react-app": "^3.1.2",
+    "babelify": "^8.0.0",
     "browserify": "^16.2.2",
     "crypto": "^1.0.1",
     "crypto-js": "^3.1.9-1",

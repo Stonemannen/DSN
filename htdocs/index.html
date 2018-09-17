@@ -11,8 +11,10 @@
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-</head>
 
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+</head>
 <body>
     
     <div id="loginDiv">
@@ -50,8 +52,8 @@
         <div id='feed'>
 
         </div>
+        <div id='follow'></div>
     </div>
-
     <script>
         if (!getCookie("publicKey")) {
             document.getElementById('loginDiv').style.display = "block";

@@ -63,7 +63,6 @@ function login() {
     setCookie("publicKey", publicKey, 30);
     setCookie("privateKey", privateKey, 30);
     setCookie("error", "")
-    validateLogin();
 }
 
 function signup() {

@@ -212,7 +212,11 @@ async function publishProfile(PublicKey, Name, profileHash) {
     for (var i = 0; i < all.length; i++) {
         console.log(all);
         console.log(all[i]);
-        var body = JSON.parse(all[i]);
+        try {
+            var body = JSON.parse(all[i]);
+        } catch (error) {
+            console.log("error")
+        }
         if (body.publicKey == PublicKey) {
             all = profileDB.iterator({
                 limit: -1
@@ -235,6 +239,7 @@ async function publishProfile(PublicKey, Name, profileHash) {
         limit: -1
     }).collect().map((e) => e.payload.value)
     console.log(all);
+    updateFeed();
 }
 
 async function createKeyPair() {
@@ -404,6 +409,8 @@ function login() {
 }
 
 function updateFeed() {
+    document.getElementById('follow').style.display = "none";
+    document.getElementById('feed').style.display = "block";
     console.log("updating feed")
     document.getElementById('feed').innerHTML = "";
     if (getCookie("publicKey")) {
@@ -487,6 +494,8 @@ function getCookie(cname) {
 }
 
 async function search() {
+    document.getElementById('follow').style.display = "block";
+    document.getElementById('feed').style.display = "none";
     console.log("Searching")
     document.getElementById('feed').innerHTML = "";
     const all = profileDB.iterator({
@@ -501,13 +510,25 @@ async function search() {
         h5.appendChild(text);
         var button = document.createElement("input");
         button.type = "button"
-        button.onclick = function () {
+        button.onclick = function(){
             follow(body.username)
+            console.log(body.username)
         }
+        
+        console.log("created")
         button.value = "Follow"
         feed.insertBefore(button, feed.childNodes[0]);
         feed.insertBefore(h5, feed.childNodes[0]);
     }
+    var rows = [];
+    for (var i = 0; i < all.length; i++) {
+        var body = JSON.parse(all[i]);
+        rows.push(<FollowButton key={i} user={body.username} />)    
+    }
+    ReactDOM.render(
+        <div>{rows}</div>,
+        document.getElementById('follow')
+    );
 }
 
 function follow(username) {
@@ -565,3 +586,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('updateFeed').onclick = updateFeed
     document.getElementById('search').onclick = search
 })
+
+class FollowButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          user: this.props.user,
+        };
+      }
+    render() {
+      return (
+        
+            <h4>{this.state.user}  <button className="followButton" onClick={() =>follow(this.state.user)}>
+            Follow
+        </button></h4>
+        
+        
+      );
+    }
+  }
