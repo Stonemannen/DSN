@@ -30,6 +30,8 @@ const node = new IPFS({
   }
 });
 
+var feed = [];
+
 document.getElementById("loginDiv").style.display = "none";
 document.getElementById("mainDiv").style.display = "none";
 
@@ -113,13 +115,12 @@ node.on("ready", async () => {
   } else {
     document.getElementById("loginDiv").style.display = "none";
     document.getElementById("mainDiv").style.display = "block";
-    if(!getCookie("createProfile")){
+    if (!getCookie("createProfile")) {
       validateLogin();
-    } else{
+    } else {
       document.getElementById("loading").style.display = "none";
     }
   }
-  
 });
 
 function validateLogin() {
@@ -139,7 +140,7 @@ function validateLogin() {
     })
     .collect()
     .map(e => e.payload.value);
-  if(all.length < 1){
+  if (all.length < 1) {
     setTimeout(validateLogin, 3000);
     return;
   }
@@ -486,11 +487,11 @@ function login() {
   updateFeed();
 }
 
-function updateFeed() {
+async function updateFeed() {
+  feed = [];
   document.getElementById("follow").style.display = "none";
   document.getElementById("feed").style.display = "block";
   console.log("updating feed");
-  document.getElementById("feed").innerHTML = "";
   if (getCookie("publicKey")) {
     var publicKey = getCookie("publicKey");
   } else {
@@ -532,13 +533,9 @@ function updateFeed() {
                               var post = JSON.parse(
                                 file.content.toString("utf8")
                               );
-                              var feed = document.getElementById("feed");
-                              const h6 = document.createElement("h6");
-                              const text = document.createTextNode(
-                                profile.name + ": " + post.content[0].text
-                              );
-                              h6.appendChild(text);
-                              feed.insertBefore(h6, feed.childNodes[0]);
+                              post.profile = profile.name;
+                              feed.push(post);
+                              renderFeed();
                             });
                           });
                         }
@@ -553,6 +550,42 @@ function updateFeed() {
       });
     }
   }
+}
+
+function renderFeed() {
+  feed.sort(compare);
+  console.log(feed);
+  var rows = [];
+  for (var i = 0; i < feed.length; i++) {
+    if (feed[i].content[0].type === "txt") {
+      var date = new Date(feed[i].time);
+      rows.push(
+        <TextPost
+          key={i}
+          user={feed[i].profile}
+          text={feed[i].content[0].text}
+          time={date.toString()}
+        />
+      );
+    }
+  }
+  console.log(rows);
+  var ulStyle = {
+    listStyleType: "none"
+  };
+  ReactDOM.render(
+    <div>
+      {" "}
+      <ul style={ulStyle}>{rows}</ul>{" "}
+    </div>,
+    document.getElementById("feed")
+  );
+}
+
+function compare(a, b) {
+  if (a.time < b.time) return 1;
+  if (a.time > b.time) return -1;
+  return 0;
 }
 
 function deleteCookie(name) {
@@ -704,6 +737,29 @@ class FollowButton extends React.Component {
           Follow{" "}
         </button>{" "}
       </h4>
+    );
+  }
+}
+
+class TextPost extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: this.props.user,
+      time: this.props.time,
+      text: this.props.text
+    };
+  }
+  render() {
+    var liStyle = {
+      borderStyle: "ridge"
+    }
+    return (
+      <li style={liStyle}>
+        <i> {this.props.user} </i>
+        <small> {this.props.time} </small>
+        <h4> {this.props.text} </h4>
+      </li>
     );
   }
 }
