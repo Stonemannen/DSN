@@ -618,14 +618,13 @@ async function search() {
   document.getElementById("follow").style.display = "block";
   document.getElementById("feed").style.display = "none";
   console.log("Searching");
-  document.getElementById("feed").innerHTML = "";
   const all = profileDB
     .iterator({
       limit: -1
     })
     .collect()
     .map(e => e.payload.value);
-  for (var i = 0; i < all.length; i++) {
+  /*for (var i = 0; i < all.length; i++) {
     var body = JSON.parse(all[i]);
     console.log(body);
     var feed = document.getElementById("feed");
@@ -643,7 +642,7 @@ async function search() {
     button.value = "Follow";
     feed.insertBefore(button, feed.childNodes[0]);
     feed.insertBefore(h5, feed.childNodes[0]);
-  }
+  }*/
   var rows = [];
   for (var i = 0; i < all.length; i++) {
     var body = JSON.parse(all[i]);
@@ -709,14 +708,18 @@ function follow(username) {
   }
 }
 
+function signout(){
+  deleteCookie("publicKey");
+  document.getElementById("loginDiv").style.display = "block";
+  document.getElementById("mainDiv").style.display = "none";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("post").onclick = post;
-  document.getElementById("getProfile").onclick = getProfile;
-  document.getElementById("followProfile").onclick = followProfile;
-  document.getElementById("login").onclick = login;
   document.getElementById("updateFeed").onclick = updateFeed;
   document.getElementById("search").onclick = search;
   document.getElementById("validateLogin").onclick = validateLogin;
+  document.getElementById("signout").onclick = signout;
 });
 
 class FollowButton extends React.Component {
