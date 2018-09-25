@@ -5,6 +5,10 @@ var IPFS = require('ipfs');
 var io = require('./socket.io.js');
 var socket = io();
 
+process.on('uncaughtException', function (err) {
+    console.log('Caught exception: ', err);
+});
+
 const node = new IPFS({
     repo: "ipfss/" + String(Math.random() + Date.now()),
     start: true,
@@ -47,8 +51,41 @@ node.on('ready', async () => {
     console.log(profileDB.iterator({
         limit: -1
     }).collect().map((e) => e.payload.value))
+    socket.emit('orbit', profileDB.iterator({
+        limit: 1
+    }).collect().map((e) => e.payload.value));
 
     socket.emit('ipfs', 'ready');
+    setTimeout(sendData, 3000)
 })
+
+async function createdb() {
+    var name = "DSN"
+    profileDB = await orbitdb.open(name, {
+        // If database doesn't exist, create it
+        create: true,
+        overwrite: true,
+        // Load only the local version of the database, 
+        // don't load the latest from the network yet
+        localOnly: false,
+        type: "feed",
+        write: ['*'],
+    })
+    console.log(profileDB.address.toString())
+}
+
+function sendData(){
+    socket.emit('orbit', profileDB.iterator({
+        limit: -1
+    }).collect().map((e) => e.payload.value));
+    console.log("sent");
+    setTimeout(sendData, 30000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('createdb').onclick = createdb
+})
+
+
 
 

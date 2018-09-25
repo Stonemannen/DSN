@@ -1,13 +1,69 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>DSN</title>
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
 </head>
 <body>
-    <a id='loginn' href="./login.html"></a>
+    
+    <div id="loginDiv">
+        <div id="signup"></div>
+
+        <label>Username</label>
+        <input type="text" id="username">
+        <label>Password</label>
+        <input type="password" id="password">
+        <br>
+        <button class="waves-effect waves-light btn" id="login">Login</button>
+        or
+        <button class="waves-effect waves-light btn" onclick="location.href = './signup.html';">Sign Up</button>
+
+        <div id='message'>
+            <br>
+        </div>
+    </div> 
+    <div id="mainDiv">
+        <label>Post</label>
+        <input type="text" id="postText">
+        <button class="waves-effect waves-light btn" id="post">post</button>
+
+        <br>
+        <br>
+        <input type="text" id="searchText">
+        <button class="waves-effect waves-light btn" id="search">Search</button>
+        <button class="waves-effect waves-light btn" id="updateFeed">Update Feed</button>
+        <button class="waves-effect waves-light btn" id="signout">signout</button>
+
+        <div id='feed'>
+
+        </div>
+        <div id='follow'></div>
+    </div>
+    <div id="loading">
+        <h1>loading...</h1>
+    </div>
+    <div style="display:none">
+        Hidden
+        <button id="validateLogin"></button>
+    </div>
     <script>
-        if(!getCookie("publicKey")){
-            document.getElementById('loginn').click();
+        if (!getCookie("publicKey")) {
+            document.getElementById('loginDiv').style.display = "block";
+            document.getElementById('mainDiv').style.display = "none";
+        }else{
+            document.getElementById('loginDiv').style.display = "none";
+            document.getElementById('mainDiv').style.display = "block";
         }
 
         function getCookie(cname) {
@@ -23,33 +79,12 @@
                 }
             }
             return "";
-        }    
+        }
     </script>
-    <script src="bundle.js"></script>
-    <label>PublicKey</label>
-    <input type="text" id="publicKey">
-    <label>privateKey</label>
-    <input type="text" id="privateKey">
-    <button id='login'>login</button><br>
-    <label>Name</label>
-    <input type="text" id="name">
-    <label>Post</label>
-    <input type="text" id="postText">
-    <button id="profile">Create Profile</button>
-    <button id="post">post</button>
-    <button id="store">add to ipfs</button>
-    <button id="createdb">createdb</button><br>
-    <button id="createKeyPair">create KeyPair</button><br>
-    <label>Profile Public Key</label>
-    <input type="text" id="profilePubKey">
-    <button id="getProfile">Get Profile</button>
-    <button id="followProfile">Follow Profile</button><br><br>
-    <input type="text" id="searchText">
-    <button id="search">Search</button>
-    <button id="updateFeed">Update Feed</button>
+    <script src="js/bundle.js"></script>
+    <script src="js/loginbundle.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
 
-    <div id='feed'>
-
-    </div>
 </body>
+
 </html>
