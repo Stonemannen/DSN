@@ -624,31 +624,28 @@ async function search() {
     })
     .collect()
     .map(e => e.payload.value);
-  /*for (var i = 0; i < all.length; i++) {
-    var body = JSON.parse(all[i]);
-    console.log(body);
-    var feed = document.getElementById("feed");
-    const h5 = document.createElement("h5");
-    const text = document.createTextNode(body.username);
-    h5.appendChild(text);
-    var button = document.createElement("input");
-    button.type = "button";
-    button.onclick = function() {
-      follow(body.username);
-      console.log(body.username);
-    };
-
-    console.log("created");
-    button.value = "Follow";
-    feed.insertBefore(button, feed.childNodes[0]);
-    feed.insertBefore(h5, feed.childNodes[0]);
-  }*/
   var rows = [];
   for (var i = 0; i < all.length; i++) {
     var body = JSON.parse(all[i]);
     rows.push(<FollowButton key={i} user={body.username} />);
   }
-  ReactDOM.render(<div> {rows} </div>, document.getElementById("follow"));
+  ReactDOM.render(
+    <ul id="searchUL"> {rows} </ul>,
+    document.getElementById("follow")
+  );
+  var input, filter, ul, li, a;
+  input = document.getElementById("searchText");
+  filter = input.value.toUpperCase();
+  ul = document.getElementById("searchUL");
+  li = ul.getElementsByTagName("li");
+  for (var i = 0; i < li.length; i++) {
+    a = li[i].getElementsByTagName("a")[0];
+    if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+      li[i].style.display = "";
+    } else {
+      li[i].style.display = "none";
+    }
+  }
 }
 
 function follow(username) {
@@ -708,7 +705,7 @@ function follow(username) {
   }
 }
 
-function signout(){
+function signout() {
   deleteCookie("publicKey");
   document.getElementById("loginDiv").style.display = "block";
   document.getElementById("mainDiv").style.display = "none";
@@ -717,7 +714,7 @@ function signout(){
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("post").onclick = post;
   document.getElementById("updateFeed").onclick = updateFeed;
-  document.getElementById("search").onclick = search;
+  document.getElementById("searchText").onkeyup = search;
   document.getElementById("validateLogin").onclick = validateLogin;
   document.getElementById("signout").onclick = signout;
 });
@@ -731,15 +728,17 @@ class FollowButton extends React.Component {
   }
   render() {
     return (
-      <h4>
-        {" "}
-        {this.state.user}{" "}
-        <button
-          className="followButton"
-          onClick={() => follow(this.state.user)}>
-          Follow{" "}
-        </button>{" "}
-      </h4>
+      <li>
+        <h4>
+          {" "}
+          <a href="#">{this.state.user}</a>{" "}
+          <button
+            className="followButton"
+            onClick={() => follow(this.state.user)}>
+            Follow{" "}
+          </button>{" "}
+        </h4>
+      </li>
     );
   }
 }
@@ -756,7 +755,7 @@ class TextPost extends React.Component {
   render() {
     var liStyle = {
       borderStyle: "ridge"
-    }
+    };
     return (
       <li style={liStyle}>
         <i> {this.props.user} </i>
