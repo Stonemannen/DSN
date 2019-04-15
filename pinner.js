@@ -72,6 +72,16 @@ function pin(msg) {
                                 files.forEach((file) => {
                                     console.log(file.path)
                                     console.log(file.content.toString('utf8'))
+                                    node.files.add(Buffer.from(JSON.stringify(file.content.toString('utf8'))), (err, res) => {
+                                        if (err || !res) {
+                                          return console.error("ipfs add error", err, res);
+                                        }
+                                        res.forEach(file => {
+                                            if (file && file.hash) {
+                                              console.log("successfully stored", file.hash);
+                                            }
+                                          });
+                                    })
                                 })
                             })
                         }
